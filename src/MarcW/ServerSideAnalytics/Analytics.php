@@ -57,7 +57,7 @@ class Analytics
         $url = $this->constructGifUrl($referer, $path, $account, $visitorId, $this->maskVisitorIp());
         $this->browser->get($url, array(
             'Accept-Language: '.$acceptLanguage,
-            'User-Agent: '.$userAgent;
+            'User-Agent: '.$userAgent,
         ));
 
         $cookie = new Cookie($this->cookieName, $visitorId, time() + $this->cookiePersistence, $this->cookiePath, $domain);
