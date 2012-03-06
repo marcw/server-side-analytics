@@ -22,15 +22,17 @@ class Analytics
     private $cookieName;
     private $cookiePath;
     private $cookiePersistence;
+    private $trustProxy;
 
     private $request;
 
-    public function __construct(Browser $browser, $cookieName = '__utmmobile', $cookiePath = '/', $cookiePersistence = 63072000)
+    public function __construct(Browser $browser, $cookieName = '__utmmobile', $cookiePath = '/', $cookiePersistence = 63072000, $trustProxy = false)
     {
         $this->browser = $browser;
         $this->cookieName = $cookieName;
         $this->cookiePath = $cookiePath;
         $this->cookiePersistence = $cookiePersistence;
+        $this->trustProxy = false;
         $this->gifData =  array(
             chr(0x47), chr(0x49), chr(0x46), chr(0x38), chr(0x39), chr(0x61),
             chr(0x01), chr(0x00), chr(0x01), chr(0x00), chr(0x80), chr(0xff),
@@ -104,7 +106,7 @@ class Analytics
 
     private function maskVisitorIp()
     {
-        $ip = $this->request->getClientIp();
+        $ip = $this->request->getClientIp($this->trustProxy);
         $regex = "/^([^.]+\.[^.]+\.[^.]+\.).*/";
         if (preg_match($regex, $ip, $matches)) {
             return $matches[1] . "0";
