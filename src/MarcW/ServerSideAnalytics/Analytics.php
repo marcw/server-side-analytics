@@ -56,14 +56,13 @@ class Analytics
 
         $url = $this->constructGifUrl($referer, $path, $account, $visitorId, $this->maskVisitorIp());
         $this->browser->get($url, array(
-            'Accept-Language: '.$acceptLanguage,
+            'Accept-Language: '.$this->request->server->get('HTTP_ACCEPT_LANGUAGE'),
             'User-Agent: '.$userAgent,
         ));
 
-        $cookie = new Cookie($this->cookieName, $visitorId, time() + $this->cookiePersistence, $this->cookiePath, $domain);
+        $cookie = new Cookie($this->cookieName, $visitorId, time() + $this->cookiePersistence, $this->cookiePath, $this->request->getHost());
         $response = new Response();
-        $response->headers->add('Content-Type', 'image/gif');
-        $response->headers->add('Pragma', 'no-cache');
+        $response->headers->add(array('Content-Type' => 'image/gif', 'Pragma' =>  'no-cache'));
         $response->setPrivate();
         $response->mustRevalidate();
         $response->setExpires(new \DateTime('-10 year'));
@@ -89,7 +88,7 @@ class Analytics
         return $guidHeader;
     }
 
-    private function getVisitorId($guid, $account, $userAgent, $cookie)
+    private function getVisitorId($guid, $account, $userAgent)
     {
         $message = '';
         if (!empty($guid)) {
@@ -114,12 +113,12 @@ class Analytics
         }
     }
 
-    private function constructGifUrl($domain, $referer, $path, $account, $visitorId, $ip)
+    private function constructGifUrl($referer, $path, $account, $visitorId, $ip)
     {
         $query = http_build_query(array(
             'utmwv'  => self::VERSION,
             'utmn'   => $this->getRandomNumber(),
-            'utmhn'  => $domain,
+            'utmhn'  => $this->request->getHost(),
             'utmr'   => $referer,
             'utmp'   => $path,
             'utmac'  => $account,
